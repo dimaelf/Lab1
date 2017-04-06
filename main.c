@@ -255,6 +255,24 @@ void scan85945 (void** sear)
     *sear = d;
 }
 
+void scanHer (void** sear)
+{
+    char s[20] = "Her";
+    *sear = s;
+}
+
+void scanHerman (void** sear)
+{
+    char s[20] = "Herman";
+    *sear = s;
+}
+
+void scanHerz (void** sear)
+{
+    char s[20] = "Herz";
+    *sear = s;
+}
+
 int checkint (int i, void* sear, struct list* pin)
 {
     if (*((int*)(*pin).pointer+i)==*(int*)sear){
@@ -815,6 +833,47 @@ void whereintT()
     printf ("  Success\n\n");
 }
 
+void wherestud ()
+{
+    struct list T;
+    T.length = 3;
+    T.pointer = malloc(T.length*sizeof(struct stud));
+    struct stud* p;
+    p = (struct stud*)(T.pointer);
+    int i = 0;
+    trans ("Herzzz", p+i);
+    tran ("A", p+i);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Herz", p+i);
+    tran ("B", p+i);
+    (p+i)->yed = 3;
+    i++;
+    trans ("Her", p+i);
+    tran ("C", p+i);
+    (p+i)->yed = 1;
+    i++;
+
+    printf("Her ");
+    if (where(scanHer, checkstud, &T) != 2)
+    {
+        printf("  !!Test for where of stud failed!!\n\n");
+        return;
+    }
+    printf("Herman ");
+    if (where(scanHerman, checkstud, &T) != -1)
+    {
+        printf("  !!Test for where of stud failed!!\n\n");
+        return;
+    }
+    printf("Herz ");
+    if (where(scanHerz, checkstud, &T) != 1)
+    {
+        printf("  !!Test for where of stud failed!!\n\n");
+        return;
+    }
+    printf ("  Success\n\n");
+}
 
 int main()
 {
@@ -826,6 +885,6 @@ int main()
     mapcomp();
     maplineT();
     whereintT();
-
+    wherestud();
     return 0;
 }
