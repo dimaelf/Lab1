@@ -280,40 +280,6 @@ int checkint (int i, void* sear, struct list* pin)
     return 0;
 }
 
-int checkcomp (int i, void* sear, struct list* pin)
-{
-    struct comp* p = (struct comp*)(*pin).pointer;
-    if ((*(p+i)).im==*(int*)sear){
-            return 1;}
-    return 0;
-}
-
-int checkline (int i, void* sear, struct list* pin)
-{
-    int lett = 30;
-    char* p = (char*)(*pin).pointer;
-    int j, flag=1;
-    for (j=0; *(p+i*lett+j)!='\0'; j++)
-    {
-        if (*(p+i*lett+j)!=*((char*)sear+j))
-        {
-            flag = 0;
-        }
-    }
-    if (*((char*)sear+j)!='\0')
-    {
-        return 0;
-    }
-    if (flag==1)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 int checkstud(int i, void* sear, struct list* pin)
 {
     struct stud* p = (struct stud*)(*pin).pointer;
