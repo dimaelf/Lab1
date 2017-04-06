@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 struct list
 {
     void* pointer;
     int length;
 };
-
 
 struct comp
 {
@@ -23,16 +21,36 @@ struct stud
 
 
 
-
-
-
-
-void choosekind(int* actd)
+void printint (int i, struct list* p)
 {
-    printf ("Chose kind of data:\n0-intenger\n1-float\n2-Comp\n3-lines\n4-students\n7-qiut\n");
-    scanf ("%d", actd);
+    printf ("%d ", *((int*)((*p).pointer)+i));
 }
 
+void printfl (int i, struct list* p)
+{
+    printf ("%lf ", *((double*)((*p).pointer)+i));
+}
+
+void printcomp (int i, struct list* p)
+{
+    printf ("%d+(%d)*i ", (*((struct comp*)((*p).pointer)+i)).re, (*((struct comp*)((*p).pointer)+i)).im);
+}
+
+void printline (int i, struct list* p)
+{
+    int lett = 30;
+    int j;
+    for (j=0; *((char*)((*p).pointer)+i*lett+j)!='\0'; j++)
+    {
+        printf("%c", *((char*)((*p).pointer)+i*lett+j));
+    }
+    printf("\n");
+}
+
+void printstud (int i, struct list* p)
+{
+    printf("%s %s: %d\n", ((struct stud*)((*p).pointer)+i)->sname, ((struct stud*)((*p).pointer)+i)->name, ((*((struct stud*)((*p).pointer)+i)).yed));
+}
 
 
 
@@ -49,20 +67,6 @@ void sort(int (*change)(int, struct list*), struct list* p)
         }
         if (f==0){return;}
     }
-}
-
-int changeint (int i, struct list* pin)
-{
-    int* p = (int*)(*pin).pointer;
-    if (*(p+i)< *(p+i-1))
-            {
-                int ch;
-                ch=*(p+i);
-                *(p+i)= *(p+i-1);
-                *(p+i-1)=ch;
-                return 1;
-            }
-    return 0;
 }
 
 int changefl (int i, struct list* pin)
@@ -150,13 +154,6 @@ int changestud (int i, struct list* pin)
     }
     for (j=0; (p+i-1)->sname[j]!='\0'; j++)
         {
-            if ((p+i)->sname[j]=='\0')
-            {
-                temp = *(p+i);
-                *(p+i) = *(p+i-1);
-                *(p+i-1) = temp;
-                return 1;
-            }
             if ((p+i)->sname[j]<(p+i-1)->sname[j])
             {
                 temp = *(p+i);
@@ -173,8 +170,6 @@ int changestud (int i, struct list* pin)
 }
 
 
-
-
 void map (void (*fun)(int, struct list*), struct list* p)
 {
     int i;
@@ -188,13 +183,6 @@ void funint (int i, struct list* pin)
 {
     int ch=17;
     int* p = (int*)(*pin).pointer;
-    *(p+i)=*(p+i)+ch;
-}
-
-void funfl (int i, struct list* pin)
-{
-    double ch=17.013;
-    double* p = (double*) (*pin).pointer;
     *(p+i)=*(p+i)+ch;
 }
 
@@ -235,170 +223,70 @@ void funstud (int i, struct list* pin)
 
 
 
-void addint (struct list* p)
-{
-    int n, i=0;
-    int N = (*p).length;
-    int* pnew = (int*)((*p).pointer);
-    printf("How many numbers is it?\n");
-    scanf ("%d", &n);
-    pnew = (int*)realloc(pnew, (N+n)*sizeof(int));
-    while (i<n){
-        scanf("%d", (pnew+N+i));
-        i++;
-    }
-    (*p).pointer=(void*) pnew;
-    (*p).length=N+n;
-}
 
-void addfl (struct list* p)
-{
-    int n, i=0;
-    int N = (*p).length;
-    double* pnew = (double*)((*p).pointer);
-    printf("How many numbers is it?\n");
-    scanf ("%d", &n);
-    pnew = (double*)realloc(pnew, (N+n)*sizeof(double));
-    while (i<n){
-        scanf("%lf", (pnew+N+i));
-        i++;
-    }
-    (*p).pointer= (double*) pnew;
-    (*p).length=N+n;
-}
-
-void addcomp (struct list* p)
-{
-    int n, i=0;
-    int N = (*p).length;
-    struct comp* pnew = (struct comp*)((*p).pointer);
-    printf("How many numbers is it?\n");
-    scanf ("%d", &n);
-    pnew = (struct comp*)realloc(pnew, (N+n)*sizeof(struct comp));
-    while (i<n){
-        scanf("%d%d", &((*(pnew+N+i)).re), &((*(pnew+N+i)).im));
-        i++;
-    }
-    (*p).pointer=pnew;
-    (*p).length=N+n;
-}
-
-void addline(struct list* p)
-{
-    int lett = 30;
-    int n, j, i=0;
-    char temp[lett];
-    int N = (*p).length;
-    char* pnew = (char*)((*p).pointer);
-    printf("How many lines is it?\n");
-    scanf ("%d", &n);
-    pnew = (char*)realloc(pnew, ((N+n)*lett)*sizeof(char));
-    fgets(temp, lett, stdin); //?!??
-    while (i<n){
-        fgets(temp, lett, stdin);
-        for ( j = 0; temp[j]!='\n'; j++ ){}
-        temp[j]='\0';
-        j=0;
-        while (temp[j]!='\0')
-        {
-           *(pnew+(N+i)*lett+j) = temp[j];
-           j++;
-        }
-        *(pnew+(N+i)*lett+j)=temp[j];
-        i++;
-    }
-    (*p).pointer=pnew;
-    (*p).length=N+n;
-}
-
-void addstud(struct list* p)
-{
-    int n, i=0;
-    int N = (*p).length;
-    struct stud* pnew = (struct stud*)((*p).pointer);
-    printf("How many students is it?\n");
-    scanf ("%d", &n);
-    pnew = (struct stud*)realloc(pnew, (N+n)*sizeof(struct stud));
-    while (i<n){
-        printf("Write student's sername\n");
-        scanf ("%20s", (pnew+N+i)->sname);
-        printf("Write student's name\n");
-        scanf ("%20s", ((pnew+N+i)->name));
-        printf("Write year of education\n");
-        scanf("%d", &((*(pnew+N+i)).yed));
-        printf("\n");
-        i++;
-    }
-    (*p).pointer=pnew;
-    (*p).length=N+n;
-}
-
-
-
-void where (void* (*scan)(void*), int check(int, void*, struct list*), struct list* p)
+int where (void* (*scan)(void*), int check(int, void*, struct list*), struct list* p)
 {
     int i, f=0;
     void* sear;
-    printf("What do you want to find?\n");
     scan(&sear);
     for (i=0; i<(*p).length; i++)
     {
         f=check(i, sear, p);
+        printf("%d", f);
         if (f==1){
-            return;
+            return i;
         }
     }
-    printf (" wasn't found\n");
+    return 0;
 }
 
-void scanint (void** sear)
+void scan17 (void** sear)
 {
-    *sear = malloc(sizeof(int));
-    scanf("%d", *(int*)sear);
-    printf("%d", *(int*)*sear);
+    int* d;
+    *d = -17;
+    *sear=d;
 }
 
-void scanfl (void** sear)
+void scan0 (void** sear)
 {
-    *sear = malloc(sizeof(double));
-    scanf("%lf", *(double*)sear);
-    printf("%lf", *(double*)*sear);
+    int* d;
+    *d = 0;
+    *sear=d;
 }
 
-void scanline (void** sear)
+void scan85495 (void** sear)
 {
-    int lett = 30;
-    int i;
-    char temp[lett];
-    *sear = &temp;
-    fgets( temp, 2, stdin );   //?!!!!
-    fgets(temp, lett, stdin);
-    for ( i = 0; temp[i]!='\n'; i++ ){}
-    temp[i]='\0';
-    printf("%s", temp);
+    int* d;
+    *d = 85495;
+    *sear=d;
 }
+
+void scan30 (void** sear)
+{
+    int* d;
+    *d = 30;
+    *sear=(void*)d;
+}
+
+void scan200 (void** sear)
+{
+    int* d;
+    *d = -200;
+    *sear=d;
+}
+
 
 int checkint (int i, void* sear, struct list* pin)
 {
     if (*((int*)(*pin).pointer+i)==*(int*)sear){
-            printf (": index=%d\n", i+1);
             return 1;}
     return 0;
-}
-
-int checkfl (int i, void* sear, struct list* pin)
-{
-    if (*((double*)(*pin).pointer+i)==*(double*)sear){
-            printf (": index=%d\n", i+1);
-            return 1;}
-        return 0;
 }
 
 int checkcomp (int i, void* sear, struct list* pin)
 {
     struct comp* p = (struct comp*)(*pin).pointer;
     if ((*(p+i)).im==*(int*)sear){
-            printf (": index=%d\n", i+1);
             return 1;}
     return 0;
 }
@@ -421,7 +309,6 @@ int checkline (int i, void* sear, struct list* pin)
     }
     if (flag==1)
     {
-        printf (": index=%d\n", i+1);
         return 1;
     }
     else
@@ -447,7 +334,6 @@ int checkstud(int i, void* sear, struct list* pin)
     }
     if (flag==1)
     {
-        printf (": index=%d\n", i+1);
         return 1;
     }
     else
@@ -458,128 +344,480 @@ int checkstud(int i, void* sear, struct list* pin)
 
 
 
-void printint (int i, struct list* p)
-{
-    printf ("%d ", *((int*)((*p).pointer)+i));
-}
 
-void printfl (int i, struct list* p)
+void sortflT()
 {
-    printf ("%lf ", *((double*)((*p).pointer)+i));
-}
+    struct list* flsortT;
+    flsortT->length = 7;
+    flsortT->pointer = malloc(flsortT->length*sizeof(double));
+    double* p;
+    p = (double*)(flsortT->pointer);
+    int i = 0;
+    *p = 756.83;
+    i++;
+    *(p+i) = 763096;
+    i++;
+    *(p+i) = 0;
+    i++;
+    *(p+i) = -1024.13;
+    i++;
+    *(p+i) = -1;
+    i++;
+    *(p+i) = 1488;
+    i++;
+    *(p+i) = -0.228;
+    i++;
 
-void printcomp (int i, struct list* p)
-{
-    printf ("%d+(%d)*i ", (*((struct comp*)((*p).pointer)+i)).re, (*((struct comp*)((*p).pointer)+i)).im);
-}
-
-void printline (int i, struct list* p)
-{
-    int lett = 30;
-    int j;
-    for (j=0; *((char*)((*p).pointer)+i*lett+j)!='\0'; j++)
+    p = (double*) malloc (flsortT->length*sizeof(double));
+    i=0;
+    *(p+i) = -1024.13;
+    i++;
+     *(p+i) = -1;
+    i++;
+    *(p+i) = -0.228;
+    i++;
+    *(p+i) = 0;
+    i++;
+    *(p+i) = 756.83;
+    i++;
+    *(p+i) = 1488;
+    i++;
+    *(p+i) = 763096;
+    i++;
+    sort(changefl, flsortT);
+    for (i=0; i<flsortT->length; i++)
     {
-        printf("%c", *((char*)((*p).pointer)+i*lett+j));
+        printfl(i, flsortT);
+        if (*(p+i)!= *((double*)flsortT->pointer+i))
+        {
+            printf("  !!Test of sort for float (int) failed!!\n");
+            free(p);
+            free(flsortT->pointer);
+            return;
+        }
     }
-    printf("\n");
-}
-
-void printstud (int i, struct list* p)
-{
-    printf("%s %s: %d\n", ((struct stud*)((*p).pointer)+i)->sname, ((struct stud*)((*p).pointer)+i)->name, ((*((struct stud*)((*p).pointer)+i)).yed));
+    printf("   Success\n");
+    free(p);
+    free(flsortT->pointer);
 }
 
 
-void choose (void (*print)(int, struct list*), int* actdata, struct list* plists)
+void sortcompT()
 {
-    int lett = 30;
-    int ch, i;
-    printf("Choose operation for kind of data which number is %d\n0-choose kind of data or quit\n1-add data\n2-sort\n3-map\n4-where\n", *actdata);
-    scanf ("%d",&ch);
-    if (ch==0)
+    struct list* sortT;
+    sortT->length = 5;
+    sortT->pointer = malloc(sortT->length*sizeof(struct comp));
+    struct comp* p;
+    p = (struct comp*)(sortT->pointer);
+    int i = 0;
+    p->im = 767;
+    i++;
+    (p+i)->im = -1;
+    i++;
+    (p+i)->im = 0;
+    i++;
+    (p+i)->im = 87;
+    i++;
+    (p+i)->im = -87;
+    i++;
+    for (i=0; i<sortT->length; i++)
     {
-        choosekind(actdata);
+        (p+i)->re = i;
+    }
+    p = (struct comp*) malloc (sortT->length*sizeof(struct comp));
+    i=0;
+    (p+i)->im = -87;
+    (p+i)->re = 4;
+    i++;
+    (p+i)->im = -1;
+    (p+i)->re = 1;
+    i++;
+    (p+i)->im = 0;
+    (p+i)->re = 2;
+    i++;
+    (p+i)->im = 87;
+    (p+i)->re = 3;
+    i++;
+    (p+i)->im = 767;
+    (p+i)->re = 0;
+    i++;
+    sort(changecomp, sortT);
+    int f = 1;
+    for (i=0; i<sortT->length; i++)
+    {
+        printcomp(i, sortT);
+        if (((p+i)->im != ((struct comp*)sortT->pointer+i)->im)||(((p+i)->re != ((struct comp*)sortT->pointer+i)->re)))
+        {
+            printf("  !!Test of sort for comp failed!!\n");
+            free(p);
+            free(sortT->pointer);
+            return;
+        }
+    }
+    printf("   Success\n");
+    free(p);
+    free(sortT->pointer);
+}
+
+
+void inp (char l[30], char* p, int i)
+{
+    int j;
+    for (j =0; l[j]!='\0'; j++)
+    {
+        *(p+30*i+j) = l[j];
+    }
+    *(p+30*i+j)='\0';
+}
+
+void sortlineT()
+{
+    struct list T;
+    T.length = 10;
+    int lett = 30;
+    T.pointer = malloc(T.length*lett*sizeof(char));
+    char* p;
+    p = (char*)(T.pointer);
+    char t1[30]= "strings";
+    char t2[30]= "string";
+    char t3[30]= "stri";
+    char t4[30]= "str1";
+    char t5[30]= "stri ngs";
+    char t6[30]= "stringuhjfkcvbhfivjddjv";
+    char t7[30]= "astrings";
+    char t8[30]= "zstri";
+    char t9[30]= "3strings";
+    char t10[30]= "2strings";
+    int j, i = 0;
+    inp(t1, p, i);
+    i++;
+    inp(t2, p, i);
+    i++;
+    inp(t3, p, i);
+    i++;
+    inp(t4, p, i);
+    i++;
+    inp(t5, p, i);
+    i++;
+    inp(t6, p, i);
+    i++;
+    inp(t7, p, i);
+    i++;
+    inp(t8, p, i);
+    i++;
+    inp(t9, p, i);
+    i++;
+    inp(t10, p, i);
+
+    sort(changeline, &T);
+
+    p = (char*)malloc(T.length*lett*sizeof(char));
+    i = 0;
+    inp(t10, p, i);
+    i++;
+    inp(t9, p, i);
+    i++;
+    inp(t7, p, i);
+    i++;
+    inp(t4, p, i);
+    i++;
+    inp(t3, p, i);
+    i++;
+    inp(t5, p, i);
+    i++;
+    inp(t2, p, i);
+    i++;
+    inp(t1, p, i);
+    i++;
+    inp(t6, p, i);
+    i++;
+    inp(t8, p, i);
+    int f = 1;
+    for (i=0; i<T.length; i++)
+    {
+        printline(i, &T);
+        for (j=0; *(p+lett*i+j)!='\0'; j++)
+        {
+            if ((*(p+i*lett+j)!= *((char*)T.pointer+i*lett+j))||(*((char*)T.pointer+i*lett+j)=='\0'))
+            {
+                printf("  !!Test of sort for lines failed1!!\n");
+                free(p);
+                free(T.pointer);
+                return;
+            }
+        }
+    if (*((char*)T.pointer+i*lett+j)!='\0')
+        {
+            printf("  !!Test of sort for lines failed2!!\n");
+            free(p);
+            free(T.pointer);
+            return;
+        }
+    }
+    printf("   Success\n");
+    free(p);
+    free(T.pointer);
+}
+
+
+void trans (char s[], struct stud* p)
+{
+    int i;
+    for (i=0; s[i]!='\0'; i++)
+    {
+        p->sname[i] = s[i];
+    }
+    p->sname[i] = '\0';
+}
+
+void tran (char s[], struct stud* p)
+{
+    int i;
+    for (i=0; s[i]!='\0'; i++)
+    {
+        p->name[i] = s[i];
+    }
+    p->name[i] = '\0';
+}
+
+void sortstudT()
+{
+    struct list T;
+    T.length = 6;
+    T.pointer = malloc(T.length*sizeof(struct stud));
+    struct stud* p = (struct stud*)T.pointer;
+    int f, j, i = 0;
+    trans ("Herzzz", p+i);
+    tran ("A", p+i);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Herz", p+i);
+    tran ("B", p+i);
+    (p+i)->yed = 3;
+    i++;
+    trans ("Her", p+i);
+    tran ("C", p+i);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Herz", p+i);
+    tran ("D", p+i);
+    (p+i)->yed = 2;
+    i++;
+    trans ("BHerz", p+i);
+    tran ("E", p+i);
+    (p+i)->yed = 1;
+    i++;
+    trans ("ZHerz", p+i);
+    tran ("F", p+i);
+    (p+i)->yed = 1;
+
+    sort(changestud, &T);{
+
+}   p = (struct stud*) malloc(T.length*sizeof(struct stud));
+    i = 0;
+    trans ("BHerz", p+i);
+    tran ("E", p);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Her", p+i);
+    tran ("C", p);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Herzzz", p+i);
+    tran ("A", p);
+    (p+i)->yed = 1;
+    i++;
+    trans ("ZHerz", p+i);
+    tran ("F", p+i);
+    (p+i)->yed = 1;
+    i++;
+    trans ("Herz", p+i);
+    tran ("D", p);
+    (p+i)->yed = 2;
+    i++;
+    trans ("Herz", p+i);
+    tran ("B", p);
+    (p+i)->yed = 3;
+    for (i=0; i<T.length; i++)
+    {
+        printstud(i, &T);
+        if ((p+i)->yed !=((struct stud*)T.pointer+i)->yed)
+        {
+            printf("  !!Test of sort for stud failed!!\n");
+            return;
+        }
+        for (j = 0; (p+i)->sname[j]!='\0'; j++)
+        {
+            if (((struct stud*)T.pointer+i)->sname[j] == '\0')
+            {
+                printf("  !!Test of sort for stud failed!!\n");
+                return;
+            }
+            if (((struct stud*)T.pointer+i)->sname[j] != (p+i)->sname[j])
+                {
+                    printf("  !!Test of sort for stud failed!!\n");
+                    return;
+                }
+        }
+        if (((struct stud*)T.pointer+i)->sname[j] != '\0')
+        {
+            printf("  !!Test of sort for stud failed!!\n");
+            return;
+        }
+    }
+    printf("   Success\n");
+}
+
+
+
+void mapintT ()
+{
+    struct list T;
+    T.length = 5;
+    T.pointer = malloc(T.length*sizeof(int));
+    int* p;
+    p = (int*)(T.pointer);
+    int i = 0;
+    *p = -17;
+    i++;
+    *(p+i) = 0;
+    i++;
+    *(p+i) = -16485;
+    i++;
+    *(p+i) = -8;
+    i++;
+    *(p+i) = 85945;
+    p = (int*) malloc (T.length*sizeof(int));
+    i=0;
+    *p = 0;
+    i++;
+    *(p+i) = 17;
+    i++;
+    *(p+i) = -16468;
+    i++;
+    *(p+i) = 9;
+    i++;
+    *(p+i) = 85962;
+    map(funint, &T);
+    int f = 1;
+    for (i=0; i<T.length; i++)
+    {
+        printint(i, &T);
+        if (*(p+i)!= *((int*)T.pointer+i))
+        {
+            printf("  !!Test of map for int (float) failed!!\n");
+            free(p);
+            free(T.pointer);
+            return;
+        }
+    }
+    printf("   Success\n");
+    free(p);
+    free(T.pointer);
+}
+
+
+void mapcomp()
+{
+    struct list T;
+    T.length = 3;
+    T.pointer = malloc(T.length*sizeof(struct comp));
+    struct comp* p;
+    p = (struct comp*)(T.pointer);
+    int i = 0;
+    p->im = 767;
+    i++;
+    (p+i)->im = -1;
+    i++;
+    (p+i)->im = 0;
+    i++;
+    for (i=0; i<T.length; i++)
+    {
+        (p+i)->re = i;
+    }
+    p = (struct comp*) malloc (T.length*sizeof(struct comp));
+    i=0;
+    (p+i)->im = 780;
+    i++;
+    (p+i)->im = 12;
+    i++;
+    (p+i)->im = 13;
+    map(funcomp, &T);
+    int f = 1;
+    for (i=0; i<T.length; i++)
+    {
+        printcomp(i, &T);
+        if (((p+i)->im != ((struct comp*)T.pointer+i)->im)||((i != ((struct comp*)T.pointer+i)->re)))
+        {
+            printf("  !!Test of sort for comp failed!!\n");
+            free(p);
+            free(T.pointer);
+            return;
+        }
+    }
+    printf("   Success\n");
+    free(p);
+    free(T.pointer);
+}
+
+
+
+void whereintT()
+{
+    struct list T;
+    T.length = 5;
+    T.pointer = malloc(T.length*sizeof(int));
+    int* p;
+    p = (int*)(T.pointer);
+    int i = 0;
+    *p = -17;
+    i++;
+    *(p+i) = 0;
+    i++;
+    *(p+i) = -16485;
+    i++;
+    *(p+i) = -8;
+    i++;
+    *(p+i) = 85945;
+
+    if (where(scan30, checkint, &T) !=0)
+    {
+        printf("  Test of where for int failed\n");
         return;
     }
-    if (ch==1)
+    if (where(scan200, checkint, &T) !=0)
     {
-        if (*actdata==0){addint(plists+*actdata);}
-        if (*actdata==1){addfl(plists+*actdata);}
-        if (*actdata==2){addcomp(plists+*actdata);}
-        if (*actdata==3){addline(plists+*actdata);}
-        if (*actdata==4){addstud(plists+*actdata);}
+        printf("  Test of where for int failed\n");
+        return;
     }
-    if (ch==2)
+    if (where(scan0, checkint, &T)==1)
     {
-        if (*actdata==0){sort(changeint, plists+*actdata);}
-        if (*actdata==1){sort(changefl, plists+*actdata);}
-        if (*actdata==2){sort(changecomp, plists+*actdata);}
-        if (*actdata==3){sort(changeline, plists+*actdata);}
-        if (*actdata==4){sort(changestud, plists+*actdata);}
-
+        printf("  Test of where for int failed\n");
+        return;
     }
-    if (ch==3)
+    if (where(scan85495, checkint, &T) ==4)
     {
-        if (*actdata==0){map(funint, plists+*actdata);}
-        if (*actdata==1){map(funfl, plists+*actdata);}
-        if (*actdata==2){map(funcomp, plists+*actdata);}
-        if (*actdata==3){map(funline, plists+*actdata);}
-        if (*actdata==4){map(funstud, plists+*actdata);}
-
+        printf("  Test of where for int failed\n");
+        return;
     }
-    if (ch==4)
+    if (where(scan17, checkint, &T) ==0)
     {
-        if (*actdata==0){where(scanint, checkint, plists+*actdata);}
-        if (*actdata==1){where(scanfl, checkfl, plists+*actdata);}
-        if (*actdata==2){where(scanint, checkcomp, plists+*actdata);}
-        if (*actdata==3){where(scanline, checkline, plists+*actdata);}
-        if (*actdata==4){where(scanline, checkstud, plists+*actdata);}
-
+        printf("  Test of where for int failed\n");
+        return;
     }
-    for (i=0; i< ((*(plists+*actdata)).length); i++)
-    {
-        print(i, plists+*actdata);
-    }
-    printf ("\n");
+    printf("  Success\n");
 }
-
-
 
 
 int main()
 {
-    int actdata;
-    struct list* plists;
-    plists=(struct list*)malloc (5*sizeof (struct list));
-    int i;
-    for (i=0; i<5; i++)
-    {
-        (*(plists+i)).length = 0;
-        (*(plists+i)).pointer = (void*)malloc(0);
-    }
-    choosekind(&actdata);
-    while (1<2)
-    {
-        if ((actdata != 0)&&(actdata!=1)&&(actdata!=2)&&(actdata!=3)&&(actdata!=4))
-        {
-              return 0;
-        }
-        else
-        {
-            if (actdata==0){choose(printint, &actdata, plists);}
-            if (actdata==1){choose(printfl, &actdata, plists);}
-            if (actdata==2){choose(printcomp, &actdata, plists);}
-            if (actdata==3){choose(printline, &actdata, plists);}
-            if (actdata==4){choose(printstud, &actdata, plists);}
-        }
-    }
+    //whereintT();
+    sortflT();
+    sortcompT();
+    sortlineT();
+    sortstudT();
+    mapintT();
+    mapcomp();
+
     return 0;
 }
-
-
-
-
-
-
-
-
